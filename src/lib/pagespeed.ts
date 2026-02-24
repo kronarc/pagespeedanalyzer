@@ -4,11 +4,11 @@
 
 interface PSIResponse {
   lighthouseResult: {
-    scores: {
-      performance: number;
-      accessibility: number;
-      'best-practices': number;
-      seo: number;
+    categories: {
+      performance: { score: number };
+      accessibility: { score: number };
+      'best-practices': { score: number };
+      seo: { score: number };
     };
     audits: {
       'speed-index': {
@@ -133,17 +133,16 @@ export async function analyzePage(
     throw new Error('GOOGLE_PSI_API_KEY is not set');
   }
 
-  const psiUrl = new URL('https://pagespeedonlineapi.googleapis.com/pagespeedonline/v5/runPagespeed');
+  const psiUrl = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
   psiUrl.searchParams.set('url', url);
   psiUrl.searchParams.set('key', apiKey);
   psiUrl.searchParams.set('strategy', strategy);
 
-  const response = await fetch(psiUrl.toString(), {
-    headers: { 'User-Agent': 'PageSpeedAnalyzer/1.0' },
-  });
+  const response = await fetch(psiUrl.toString());
 
   if (!response.ok) {
-    throw new Error(`PSI API error: ${response.status} ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`PSI API error: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`);
   }
 
   const data: PSIResponse = await response.json();
@@ -152,10 +151,32 @@ export async function analyzePage(
   const crunx = data.loadingExperience?.metrics || {};
 
   return {
-    performanceScore: Math.round((lighthouse.scores.performance || 0) * 100),
-    accessibilityScore: Math.round((lighthouse.scores.accessibility || 0) * 100),
-    bestPracticesScore: Math.round((lighthouse.scores['best-practices'] || 0) * 100),
-    seoScore: Math.round((lighthouse.scores.seo || 0) * 100),
+    performanceScore: Math.round((lighthouse.categories.performance?.score || 0) * 100),
+    accessibilityScore: Math.round((lighthouse.categories.accessibility?.score || 0) * 100),
+    bestPracticesScore: Math.round((lighthouse.categories['best-practices']?.score || 0) * 100),
+    seoScore: Math.round((lighthouse.categories.seo?.score || 0) * 100),
+    speedIndex: lighthouse.audits['speed-index']?.numericValue ?? null,
+    lcp: crunx.LARGEST_CONTENTFUL_PAINT_MS?.percentile ?? null,
+    cls: crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile ?? null,
+    inp: crunx.INTERACTION_TO_NEXT_PAINT_MS?.percentile ?? null,
+    fcp: crunx.FIRST_CONTENTFUL_PAINT_MS?.percentile ?? null,
+    ttfb: lighthouse.audits['server-response-time']?.numericValue ?? null,
+    lcpRating: crunx.LARGEST_CONTENTFUL_PAINT_MS
+      ? categoryToRating(crunx.LARGEST_CONTENTFUL_PAINT_MS.category)
+      : null,
+    clsRating: crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE
+      ? categoryToRating(crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE.category)
+      : null,
+    inpRating: crunx.INTERACTION_TO_NEXT_PAINT_MS
+      ? categoryToRating(crunx.INTERACTION_TO_NEXT_PAINT_MS.category)
+      : null,
+    fcpRating: crunx.FIRST_CONTENTFUL_PAINT_MS
+      ? categoryToRating(crunx.FIRST_CONTENTFUL_PAINT_MS.category)
+      : null,
+    ttfbRating: null, // TTFB doesn't have CrUX category
+    lighthouseJson: JSON.stringify(data),
+  };
+}
     speedIndex: lighthouse.audits['speed-index']?.numericValue ?? null,
     lcp: crunx.LARGEST_CONTENTFUL_PAINT_MS?.percentile ?? null,
     cls: crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile ?? null,
