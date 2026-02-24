@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 300; // 5 minutes timeout for analysis
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
