@@ -87,13 +87,16 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof Error && error.message.includes('PSI API')) {
       return NextResponse.json(
-        { error: 'Failed to analyze page. Please try again later.' },
+        { 
+          error: 'Failed to analyze page',
+          message: error.message 
+        },
         { status: 502 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

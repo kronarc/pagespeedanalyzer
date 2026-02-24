@@ -39,8 +39,9 @@ export function AnalyzeForm({ onAnalyze }: AnalyzeFormProps) {
         if (response.status === 429) {
           toast.error(data.message || 'Daily limit exceeded. Please try again later.');
         } else {
-          toast.error(data.error || 'Failed to analyze page');
+          toast.error(data.message || data.error || 'Failed to analyze page');
         }
+        setLoading(false);
         return;
       }
 
