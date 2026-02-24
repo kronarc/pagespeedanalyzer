@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+// @ts-ignore - Import from custom output path defined in schema.prisma
+import { PrismaClient } from '../../.prisma/client';
 
 const prismaClientSingleton = () => {
   return new PrismaClient();
