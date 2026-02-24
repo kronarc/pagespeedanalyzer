@@ -1,33 +1,21 @@
-import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { DashboardHeader } from '@/components/DashboardHeader';
-import { Home, Search, BarChart3, Settings, Zap, GitCompare, Lightbulb } from 'lucide-react';
+import { Search, Zap, GitCompare, Lightbulb } from 'lucide-react';
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-
-  if (!session) {
-    redirect('/login');
-  }
-
   const navItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/analyze', label: 'Analyze', icon: Search },
     { href: '/dashboard/compare', label: 'Compare', icon: GitCompare },
     { href: '/dashboard/optimize', label: 'Optimization Tips', icon: Lightbulb },
-    { href: '/dashboard/history', label: 'History', icon: BarChart3 },
-    { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader userEmail={session.user?.email} />
+      <DashboardHeader />
 
       {/* Sidebar + Content */}
       <div className="flex">
@@ -57,7 +45,7 @@ export default async function DashboardLayout({
 
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
               <p className="text-xs text-muted-foreground flex items-center gap-2">
-                <span className="text-primary">✨</span> Free Version
+                <span className="text-primary">✨</span> Public Version
               </p>
             </div>
           </div>
@@ -65,7 +53,7 @@ export default async function DashboardLayout({
           {/* Footer */}
           <div className="p-4 border-t border-border text-center">
             <p className="text-xs text-muted-foreground">
-              Version 1.0.0
+              Version 1.1.0 (No DB)
             </p>
           </div>
         </aside>

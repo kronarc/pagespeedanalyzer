@@ -1,7 +1,4 @@
-import { auth } from '@/lib/auth';
 import { analyzePage } from '@/lib/pagespeed';
-import { checkUsageAllowed, incrementUsage, getUsageToday } from '@/lib/usage';
-import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 300; // 5 minutes timeout for analysis
@@ -9,7 +6,6 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
     const { url, deviceType = 'mobile' } = await request.json();
 
     if (!url) {
@@ -23,76 +19,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
     }
 
-    const userId = session?.user?.id || null;
-    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip') || null;
+    // Run analysis directly without saving to DB
+    const result = await analyzePage(url, deviceType);
 
-    // Run analysis
-    let result;
-    try {
-      result = await analyzePage(url, deviceType);
-    } catch (error: any) {
-      if (error.message.includes('GOOGLE_PSI_API_KEY')) {
-        const envKeys = Object.keys(process.env).filter(k => 
-          k.includes('PSI') || 
-          k.includes('GOOGLE') || 
-          k.includes('API') || 
-          k.includes('KEY')
-        );
-        return NextResponse.json(
-          { 
-            error: 'Configuration Error', 
-            message: `GOOGLE_PSI_API_KEY is not found. Found keys: [${envKeys.join(', ')}]. Please check Vercel Environment Variables.` 
-          },
-          { status: 500 }
-        );
-      }
-      throw error;
-    }
-
-    // Save to database
-    const analysis = await prisma.analysis.create({
-      data: {
-        userId: userId,
-        url,
-        deviceType,
-        performanceScore: result.performanceScore,
-        accessibilityScore: result.accessibilityScore,
-        bestPracticesScore: result.bestPracticesScore,
-        seoScore: result.seoScore,
-        speedIndex: result.speedIndex,
-        lcp: result.lcp,
-        cls: result.cls,
-        inp: result.inp,
-        fcp: result.fcp,
-        ttfb: result.ttfb,
-        lcpRating: result.lcpRating,
-        clsRating: result.clsRating,
-        inpRating: result.inpRating,
-        fcpRating: result.fcpRating,
-        ttfbRating: result.ttfbRating,
-        // Store full Lighthouse JSON for all users
-        lighthouseJson: result.lighthouseJson,
-      },
-    });
-
-    // Increment usage
-    await incrementUsage(userId, ipAddress);
-
-    // Get updated usage
-    const usage = await getUsageToday(userId, ipAddress);
-
+    // Return the result directly
     return NextResponse.json(
       {
-        data: analysis,
-        usage: {
-          current: usage,
-          limit: -1, // Unlimited
+        data: {
+          id: Math.random().toString(36).substring(7),
+          url,
+          deviceType,
+          ...result,
+          createdAt: new Date().toISOString(),
         },
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('[/api/analyze]', error);
+
+    if (error.message.includes('GOOGLE_PSI_API_KEY')) {
+      return NextResponse.json(
+        { 
+          error: 'Configuration Error', 
+          message: 'GOOGLE_PSI_API_KEY is missing from environment variables. Please add it to your Vercel Dashboard Settings.' 
+        },
+        { status: 500 }
+      );
+    }
 
     if (error instanceof Error && error.message.includes('PSI API')) {
       return NextResponse.json(

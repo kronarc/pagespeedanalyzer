@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Fira_Code } from "next/font/google";
-import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -36,10 +35,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${firaCode.variable} antialiased`}
       >
-        <SessionProvider>
-          {children}
-          <Toaster />
-        </SessionProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );

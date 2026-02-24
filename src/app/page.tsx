@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 
-export default async function Home() {
-  const session = await auth();
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-black">
       <header className="border-b border-zinc-200 dark:border-zinc-800">
@@ -13,22 +10,9 @@ export default async function Home() {
             PageSpeedAnalyzer
           </div>
           <div className="flex gap-4">
-            {session ? (
-              <>
-                <Link href="/dashboard">
-                  <Button variant="default">Dashboard</Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="outline">Sign In</Button>
-                </Link>
-                <Link href="/login">
-                  <Button>Get Started</Button>
-                </Link>
-              </>
-            )}
+            <Link href="/dashboard">
+              <Button variant="default">Launch App</Button>
+            </Link>
           </div>
         </nav>
       </header>
@@ -39,16 +23,19 @@ export default async function Home() {
             Analyze Website Performance
           </h1>
           <p className="mt-6 text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-            Get detailed insights into your website's performance using Google PageSpeed Insights.
+            Get instant insights into your website's performance using Google PageSpeed Insights.
             Track Core Web Vitals, Lighthouse scores, and optimize for better user experience.
           </p>
           <div className="mt-10 flex gap-4 justify-center">
-            <Link href={session ? "/dashboard" : "/login"}>
-              <Button size="lg" className="text-lg px-8">
-                Start Analyzing Free
+            <Link href="/dashboard/analyze">
+              <Button size="lg" className="text-lg px-8 h-14">
+                Start Analyzing Now
               </Button>
             </Link>
           </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            No account or database required. Fast & Stateless.
+          </p>
         </div>
 
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -73,12 +60,12 @@ export default async function Home() {
           </div>
 
           <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
-            <div className="text-3xl mb-3">📈</div>
+            <div className="text-3xl mb-3">⚖️</div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-              Performance Tracking
+              Compare Sites
             </h3>
             <p className="text-zinc-600 dark:text-zinc-400">
-              Monitor trends over time with unlimited history for all users.
+              Run side-by-side comparisons to see how your site stacks up against competitors.
             </p>
           </div>
         </div>
