@@ -31,15 +31,16 @@ export async function POST(request: NextRequest) {
       result = await analyzePage(url, deviceType);
     } catch (error: any) {
       if (error.message.includes('GOOGLE_PSI_API_KEY')) {
+        const envKeys = Object.keys(process.env).filter(k => k.includes('PSI') || k.includes('GOOGLE'));
         return NextResponse.json(
           { 
             error: 'Configuration Error', 
-            message: 'GOOGLE_PSI_API_KEY is missing from environment variables. Please add it to your Vercel Dashboard Settings.' 
+            message: `GOOGLE_PSI_API_KEY is not found by the server. Found similar keys: [${envKeys.join(', ')}]. If empty, please Redeploy in Vercel after saving the variable.` 
           },
           { status: 500 }
         );
       }
-      throw error; // Re-throw for general error handler
+      throw error;
     }
 
     // Save to database
