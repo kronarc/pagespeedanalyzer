@@ -25,20 +25,22 @@ export async function POST(request: NextRequest) {
     const userId = session?.user?.id || null;
     const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip') || null;
 
-    // Check usage limits (always true now)
-    const allowed = await checkUsageAllowed(userId, ipAddress);
-    if (!allowed) {
-      return NextResponse.json(
-        {
-          error: 'Daily limit exceeded',
-          message: 'An error occurred checking your usage.',
-        },
-        { status: 429 }
-      );
-    }
-
     // Run analysis
-    const result = await analyzePage(url, deviceType);
+    let result;
+    try {
+      result = await analyzePage(url, deviceType);
+    } catch (error: any) {
+      if (error.message.includes('GOOGLE_PSI_API_KEY')) {
+        return NextResponse.json(
+          { 
+            error: 'Configuration Error', 
+            message: 'GOOGLE_PSI_API_KEY is missing from environment variables. Please add it to your Vercel Dashboard Settings.' 
+          },
+          { status: 500 }
+        );
+      }
+      throw error; // Re-throw for general error handler
+    }
 
     // Save to database
     const analysis = await prisma.analysis.create({

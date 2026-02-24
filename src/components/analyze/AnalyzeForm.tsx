@@ -20,9 +20,16 @@ export function AnalyzeForm({ onAnalyze }: AnalyzeFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!url.trim()) {
+    let formattedUrl = url.trim();
+    if (!formattedUrl) {
       toast.error('Please enter a URL');
       return;
+    }
+
+    // Auto-add https:// if protocol is missing
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+      formattedUrl = `https://${formattedUrl}`;
+      setUrl(formattedUrl);
     }
 
     setLoading(true);
@@ -30,7 +37,7 @@ export function AnalyzeForm({ onAnalyze }: AnalyzeFormProps) {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, deviceType }),
+        body: JSON.stringify({ url: formattedUrl, deviceType }),
       });
 
       const data = await response.json();
