@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     // Save to database
     const analysis = await prisma.analysis.create({
       data: {
-        userId: userId || undefined,
+        userId: userId,
         url,
         deviceType,
         performanceScore: result.performanceScore,

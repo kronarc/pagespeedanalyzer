@@ -68,7 +68,7 @@ model VerificationToken {
 // Core domain models
 model Analysis {
   id        String   @id @default(cuid())
-  userId    String
+  userId    String?
   url       String
   deviceType String  // "mobile" | "desktop"
 
@@ -96,7 +96,7 @@ model Analysis {
   // Lighthouse audit data (stored for all users)
   lighthouseJson    String?  @db.Text // JSON string of full Lighthouse report
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
