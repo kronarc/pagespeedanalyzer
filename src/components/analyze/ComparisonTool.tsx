@@ -26,9 +26,22 @@ export function ComparisonTool() {
   }>({ site1: null, site2: null });
 
   const handleAnalyze = async () => {
-    if (!url1.trim() || !url2.trim()) {
+    let formattedUrl1 = url1.trim();
+    let formattedUrl2 = url2.trim();
+
+    if (!formattedUrl1 || !formattedUrl2) {
       toast.error('Please enter both URLs');
       return;
+    }
+
+    // Auto-add https:// if protocol is missing
+    if (!/^https?:\/\//i.test(formattedUrl1)) {
+      formattedUrl1 = `https://${formattedUrl1}`;
+      setUrl1(formattedUrl1);
+    }
+    if (!/^https?:\/\//i.test(formattedUrl2)) {
+      formattedUrl2 = `https://${formattedUrl2}`;
+      setUrl2(formattedUrl2);
     }
 
     setLoading(true);
@@ -37,17 +50,18 @@ export function ComparisonTool() {
         fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: url1, deviceType: 'mobile' }),
+          body: JSON.stringify({ url: formattedUrl1, deviceType: 'mobile' }),
         }),
         fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: url2, deviceType: 'mobile' }),
+          body: JSON.stringify({ url: formattedUrl2, deviceType: 'mobile' }),
         }),
       ]);
 
       if (!res1.ok || !res2.ok) {
         toast.error('Failed to analyze one or both URLs');
+        setLoading(false);
         return;
       }
 
@@ -56,14 +70,14 @@ export function ComparisonTool() {
 
       setResults({
         site1: {
-          url: url1,
+          url: formattedUrl1,
           score: data1.data.performanceScore,
           lcp: data1.data.lcp,
           cls: data1.data.cls,
           inp: data1.data.inp,
         },
         site2: {
-          url: url2,
+          url: formattedUrl2,
           score: data2.data.performanceScore,
           lcp: data2.data.lcp,
           cls: data2.data.cls,
