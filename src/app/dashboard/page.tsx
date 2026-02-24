@@ -80,7 +80,8 @@ export default async function DashboardPage() {
         {recentAnalyses.length > 0 ? (
           <div className="space-y-2">
             {recentAnalyses.map((analysis: any) => {
-              const getScoreColor = (score: number) => {
+              const getScoreColor = (score: number | null) => {
+                if (score === null || score === undefined) return 'text-muted-foreground';
                 if (score >= 90) return 'text-[#0cce6b]';
                 if (score >= 50) return 'text-[#ffa400]';
                 return 'text-[#ff4e42]';
@@ -100,7 +101,7 @@ export default async function DashboardPage() {
                     <div className="flex items-center gap-4 flex-shrink-0">
                       <div className="text-right">
                         <div className={`text-2xl font-bold ${getScoreColor(analysis.performanceScore)}`}>
-                          {analysis.performanceScore}
+                          {analysis.performanceScore ?? '—'}
                         </div>
                         <p className="text-xs text-muted-foreground font-medium">
                           Performance

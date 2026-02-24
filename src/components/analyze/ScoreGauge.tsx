@@ -5,29 +5,33 @@ import { Card } from '@/components/ui/card';
 
 interface ScoreGaugeProps {
   label: string;
-  score: number;
+  score: number | null;
   maxScore?: number;
 }
 
-function getScoreRating(score: number): string {
+function getScoreRating(score: number | null): string {
+  if (score === null || score === undefined) return 'N/A';
   if (score >= 90) return 'Good';
   if (score >= 50) return 'Needs Improvement';
   return 'Poor';
 }
 
 export function ScoreGauge({ label, score, maxScore = 100 }: ScoreGaugeProps) {
-  const percentage = (score / maxScore) * 100;
-  const color = getLighthouseScoreColor(score);
+  const displayScore = score ?? 0;
+  const percentage = (displayScore / maxScore) * 100;
+  const color = score !== null ? getLighthouseScoreColor(score) : '#888888';
   const rating = getScoreRating(score);
 
   return (
     <Card className="p-8 flex flex-col items-center justify-center h-full">
       <div className="relative w-40 h-40 flex items-center justify-center mb-6">
         {/* Outer glow effect */}
-        <div
-          className="absolute inset-0 rounded-full blur-xl opacity-20"
-          style={{ backgroundColor: color }}
-        />
+        {score !== null && (
+          <div
+            className="absolute inset-0 rounded-full blur-xl opacity-20"
+            style={{ backgroundColor: color }}
+          />
+        )}
 
         <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
           {/* Background circle */}
@@ -57,7 +61,7 @@ export function ScoreGauge({ label, score, maxScore = 100 }: ScoreGaugeProps) {
 
         <div className="absolute text-center">
           <div className="text-5xl font-bold" style={{ color }}>
-            {score}
+            {score ?? '—'}
           </div>
           <div className="text-xs font-medium text-muted-foreground mt-1">
             {rating}

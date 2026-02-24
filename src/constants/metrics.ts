@@ -60,7 +60,8 @@ export const LIGHTHOUSE_SCORE_COLORS = {
   0: '#ff4e42',   // red
 };
 
-export function getLighthouseScoreColor(score: number): string {
+export function getLighthouseScoreColor(score: number | null | undefined): string {
+  if (score === null || score === undefined) return '#888888';
   if (score >= 90) return LIGHTHOUSE_SCORE_COLORS[90];
   if (score >= 50) return LIGHTHOUSE_SCORE_COLORS[50];
   return LIGHTHOUSE_SCORE_COLORS[0];
