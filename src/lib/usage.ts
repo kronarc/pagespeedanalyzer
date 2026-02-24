@@ -61,24 +61,28 @@ export async function incrementUsage(userId: string | null, ipAddress: string | 
       },
     });
   } else if (ipAddress) {
-    await prisma.usageLog.upsert({
+    // For anonymous users, we search by IP and date
+    const existingLog = await prisma.usageLog.findFirst({
       where: {
-        userId_date: {
-          userId: null,
-          date: today,
-        },
-      },
-      update: {
-        count: {
-          increment: 1,
-        },
-      },
-      create: {
         ipAddress,
         date: today,
-        count: 1,
       },
     });
+
+    if (existingLog) {
+      await prisma.usageLog.update({
+        where: { id: existingLog.id },
+        data: { count: { increment: 1 } },
+      });
+    } else {
+      await prisma.usageLog.create({
+        data: {
+          ipAddress,
+          date: today,
+          count: 1,
+        },
+      });
+    }
   }
 }
 
