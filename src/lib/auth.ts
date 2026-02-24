@@ -21,10 +21,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     session({ session, user }) {
-      // Attach userId and subscriptionStatus to session
+      // Attach userId to session
       if (session.user) {
         session.user.id = user.id;
-        (session.user as any).subscriptionStatus = user.subscriptionStatus;
       }
       return session;
     },

@@ -23,11 +23,6 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  // Stripe subscription fields
-  stripeCustomerId    String?   @unique
-  stripeSubscriptionId String?  @unique
-  subscriptionStatus  String    @default("free") // "free" | "active" | "canceled" | "past_due"
-
   analyses   Analysis[]
   usageLogs  UsageLog[]
 
@@ -98,7 +93,7 @@ model Analysis {
   fcpRating         String?
   ttfbRating        String?
 
-  // Lighthouse audit data (stored for paid users)
+  // Lighthouse audit data (stored for all users)
   lighthouseJson    String?  @db.Text // JSON string of full Lighthouse report
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)

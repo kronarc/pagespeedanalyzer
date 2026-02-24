@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 export default async function DashboardPage() {
   const session = await auth();
   const userId = session?.user?.id;
-  const subscriptionStatus = (session?.user as any)?.subscriptionStatus || 'free';
 
   if (!userId) {
     return <div>Not authenticated</div>;
@@ -16,13 +15,16 @@ export default async function DashboardPage() {
 
   // Get usage for today
   const usage = await getUsageToday(userId, null);
-  const limit = subscriptionStatus === 'active' ? -1 : 5;
 
   // Get latest analyses
   const recentAnalyses = await prisma.analysis.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
     take: 5,
+  });
+
+  const totalAnalyses = await prisma.analysis.count({
+    where: { userId },
   });
 
   return (
@@ -36,7 +38,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 border-primary/10">
           <h3 className="text-sm font-semibold text-muted-foreground mb-3">
             Analyses Today
@@ -45,16 +47,9 @@ export default async function DashboardPage() {
             <div className="text-4xl font-bold text-foreground">
               {usage}
             </div>
-            {limit !== -1 && (
-              <span className="text-lg text-muted-foreground font-medium">
-                /{limit}
-              </span>
-            )}
           </div>
           <p className="text-xs text-muted-foreground/70 mt-3">
-            {limit === -1
-              ? '♾️ Unlimited (Pro)'
-              : `${limit - usage} remaining today`}
+            ✨ Unlimited analyses
           </p>
         </Card>
 
@@ -63,25 +58,11 @@ export default async function DashboardPage() {
             Total Analyses
           </h3>
           <div className="text-4xl font-bold text-foreground">
-            {recentAnalyses.length}
+            {totalAnalyses}
           </div>
           <p className="text-xs text-muted-foreground/70 mt-3">
             All time
           </p>
-        </Card>
-
-        <Card className="p-6 border-primary/20 bg-primary/5">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-            Subscription
-          </h3>
-          <div className="text-3xl font-bold text-primary capitalize mb-3">
-            {subscriptionStatus === 'active' ? '⭐ Pro' : 'Free'}
-          </div>
-          {subscriptionStatus !== 'active' && (
-            <Link href="/pricing" className="text-xs font-medium text-primary hover:underline block">
-              Upgrade to Pro →
-            </Link>
-          )}
         </Card>
       </div>
 

@@ -31,17 +31,10 @@ export async function getUsageToday(userId: string | null, ipAddress: string | n
 
 export async function checkUsageAllowed(
   userId: string | null,
-  ipAddress: string | null,
-  subscriptionStatus: string | null
+  ipAddress: string | null
 ): Promise<boolean> {
-  // Paid users have unlimited analyses
-  if (subscriptionStatus === 'active') {
-    return true;
-  }
-
-  // Free users are limited to 5 per day
-  const usage = await getUsageToday(userId, ipAddress);
-  return usage < FREE_TIER_LIMIT;
+  // Website is now 100% free with unlimited analyses
+  return true;
 }
 
 export async function incrementUsage(userId: string | null, ipAddress: string | null) {

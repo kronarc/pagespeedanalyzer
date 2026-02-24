@@ -22,7 +22,6 @@ export default function HistoryPage() {
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [filteredAnalyses, setFilteredAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPaid, setIsPaid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -32,18 +31,12 @@ export default function HistoryPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          if (response.status === 403) {
-            setIsPaid(false);
-            toast.error('History is only available for paid subscribers');
-          } else {
-            toast.error('Failed to load history');
-          }
+          toast.error('Failed to load history');
           return;
         }
 
         setAnalyses(data.analyses);
         setFilteredAnalyses(data.analyses);
-        setIsPaid(true);
       } catch (error) {
         toast.error('Something went wrong');
         console.error(error);
@@ -67,34 +60,6 @@ export default function HistoryPage() {
     if (score >= 50) return 'text-[#ffa400]';
     return 'text-[#ff4e42]';
   };
-
-  if (!isPaid) {
-    return (
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold text-foreground">History</h1>
-          <p className="text-muted-foreground mt-2">
-            View all your past analyses
-          </p>
-        </div>
-
-        <Card className="p-12 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="text-6xl">🔒</div>
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Premium Feature
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-            History tracking is available for Pro subscribers. Upgrade now to access unlimited analyses and full history.
-          </p>
-          <Link href="/pricing">
-            <Button size="lg">Upgrade to Pro</Button>
-          </Link>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">

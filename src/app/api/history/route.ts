@@ -7,15 +7,6 @@ const PAGE_SIZE = 10;
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
-    const subscriptionStatus = (session?.user as any)?.subscriptionStatus || 'free';
-
-    // Only paid users can access history
-    if (subscriptionStatus !== 'active') {
-      return NextResponse.json(
-        { error: 'History is only available for paid subscribers' },
-        { status: 403 }
-      );
-    }
 
     const userId = session?.user?.id;
     if (!userId) {

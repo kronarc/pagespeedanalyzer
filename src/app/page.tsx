@@ -45,12 +45,7 @@ export default async function Home() {
           <div className="mt-10 flex gap-4 justify-center">
             <Link href={session ? "/dashboard" : "/login"}>
               <Button size="lg" className="text-lg px-8">
-                Start Analyzing
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                View Pricing
+                Start Analyzing Free
               </Button>
             </Link>
           </div>
@@ -83,7 +78,7 @@ export default async function Home() {
               Performance Tracking
             </h3>
             <p className="text-zinc-600 dark:text-zinc-400">
-              Monitor trends over time with unlimited history on paid plans.
+              Monitor trends over time with unlimited history for all users.
             </p>
           </div>
         </div>

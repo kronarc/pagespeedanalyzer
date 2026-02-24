@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 
 declare module 'next-auth' {
   interface User {
-    subscriptionStatus?: string;
+    // Basic user info
   }
 
   interface Session {
@@ -11,7 +11,6 @@ declare module 'next-auth' {
       email?: string | null;
       name?: string | null;
       image?: string | null;
-      subscriptionStatus?: string;
     };
   }
 }

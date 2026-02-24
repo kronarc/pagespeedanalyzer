@@ -24,15 +24,14 @@ export async function POST(request: NextRequest) {
 
     const userId = session?.user?.id || null;
     const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip') || null;
-    const subscriptionStatus = (session?.user as any)?.subscriptionStatus || 'free';
 
-    // Check usage limits
-    const allowed = await checkUsageAllowed(userId, ipAddress, subscriptionStatus);
+    // Check usage limits (always true now)
+    const allowed = await checkUsageAllowed(userId, ipAddress);
     if (!allowed) {
       return NextResponse.json(
         {
           error: 'Daily limit exceeded',
-          message: 'Free tier users are limited to 5 analyses per day. Please upgrade to continue.',
+          message: 'An error occurred checking your usage.',
         },
         { status: 429 }
       );
@@ -62,11 +61,8 @@ export async function POST(request: NextRequest) {
         inpRating: result.inpRating,
         fcpRating: result.fcpRating,
         ttfbRating: result.ttfbRating,
-        // Only store full Lighthouse JSON for paid users
-        lighthouseJson:
-          subscriptionStatus === 'active'
-            ? result.lighthouseJson
-            : undefined,
+        // Store full Lighthouse JSON for all users
+        lighthouseJson: result.lighthouseJson,
       },
     });
 
@@ -81,7 +77,7 @@ export async function POST(request: NextRequest) {
         data: analysis,
         usage: {
           current: usage,
-          limit: subscriptionStatus === 'active' ? -1 : 5,
+          limit: -1, // Unlimited
         },
       },
       { status: 200 }

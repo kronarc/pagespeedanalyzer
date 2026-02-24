@@ -16,15 +16,12 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  const subscriptionStatus = (session?.user as any)?.subscriptionStatus || 'free';
-  const isPro = subscriptionStatus === 'active';
-
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/analyze', label: 'Analyze', icon: Search },
     { href: '/dashboard/compare', label: 'Compare', icon: GitCompare },
     { href: '/dashboard/optimize', label: 'Optimization Tips', icon: Lightbulb },
-    { href: '/dashboard/history', label: 'History', icon: BarChart3, proOnly: true },
+    { href: '/dashboard/history', label: 'History', icon: BarChart3 },
     { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   ];
 
@@ -65,30 +62,15 @@ export default async function DashboardLayout({
             <nav className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isProOnly = item.proOnly && !isPro;
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                      isProOnly
-                        ? 'opacity-50 cursor-not-allowed'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted group'
-                    } relative`}
-                    onClick={(e) => {
-                      if (isProOnly) {
-                        e.preventDefault();
-                      }
-                    }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all text-muted-foreground hover:text-foreground hover:bg-muted group relative"
                   >
                     <Icon className="w-5 h-5" />
                     <span>{item.label}</span>
-                    {item.proOnly && !isPro && (
-                      <span className="ml-auto text-xs bg-primary/20 text-primary px-2 py-1 rounded font-semibold">
-                        Pro
-                      </span>
-                    )}
                   </Link>
                 );
               })}
@@ -97,28 +79,11 @@ export default async function DashboardLayout({
             {/* Divider */}
             <div className="h-px bg-border" />
 
-            {/* Upgrade CTA */}
-            {!isPro ? (
-              <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
-                <h4 className="font-semibold text-foreground mb-1 text-sm flex items-center gap-2">
-                  <span>✨</span> Upgrade to Pro
-                </h4>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Unlimited analyses, full history, and more.
-                </p>
-                <Link href="/pricing" className="block w-full">
-                  <Button className="w-full" size="sm" variant="default">
-                    Get Pro
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
-                <p className="text-xs text-muted-foreground flex items-center gap-2">
-                  <span className="text-primary">⭐</span> Pro Member
-                </p>
-              </div>
-            )}
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
+              <p className="text-xs text-muted-foreground flex items-center gap-2">
+                <span className="text-primary">✨</span> Free Version
+              </p>
+            </div>
           </div>
 
           {/* Footer */}
