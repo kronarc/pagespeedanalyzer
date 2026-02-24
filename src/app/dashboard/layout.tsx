@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { signOut } from '@/lib/auth';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import { Home, Search, BarChart3, Settings, Zap, GitCompare, Lightbulb } from 'lucide-react';
 
 export default async function DashboardLayout({
@@ -27,31 +27,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-40 shadow-sm">
-        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-primary flex items-center gap-2">
-            <Zap className="w-6 h-6" />
-            PageSpeedAnalyzer
-          </Link>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-muted-foreground">
-              {session.user?.email}
-            </div>
-            <div className="w-px h-6 bg-border" />
-            <form
-              action={async () => {
-                'use server';
-                await signOut({ redirectTo: '/' });
-              }}
-            >
-              <Button type="submit" variant="ghost" size="sm">
-                Sign Out
-              </Button>
-            </form>
-          </div>
-        </nav>
-      </header>
+      <DashboardHeader userEmail={session.user?.email} />
 
       {/* Sidebar + Content */}
       <div className="flex">
