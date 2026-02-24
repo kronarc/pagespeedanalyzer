@@ -1,29 +1,15 @@
-// @ts-ignore - Import directly from generated client
-import { PrismaClient } from '../../.prisma/client';
+import { PrismaClient } from '@prisma/client';
 
-const globalForPrisma = globalThis as unknown as { prisma: any };
+const prismaClientSingleton = () => {
+  return new PrismaClient();
+};
 
-// Lazy initialize Prisma - prevents instantiation during build
-function getPrismaInstance() {
-  if (globalForPrisma.prisma) {
-    return globalForPrisma.prisma;
-  }
-
-  const prismaClient = new (PrismaClient as any)({
-    log: process.env.NODE_ENV === 'development' ? ['query'] : [],
-  } as any);
-
-  if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = prismaClient;
-  }
-
-  return prismaClient;
+declare global {
+  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
-// Create a proxy that lazy-initializes Prisma
-export const prisma = new Proxy({} as any, {
-  get(target, prop) {
-    const instance = getPrismaInstance();
-    return Reflect.get(instance, prop);
-  },
-});
+export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prismaGlobal = prisma;
+}
