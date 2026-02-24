@@ -177,25 +177,3 @@ export async function analyzePage(
     lighthouseJson: JSON.stringify(data),
   };
 }
-    speedIndex: lighthouse.audits['speed-index']?.numericValue ?? null,
-    lcp: crunx.LARGEST_CONTENTFUL_PAINT_MS?.percentile ?? null,
-    cls: crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile ?? null,
-    inp: crunx.INTERACTION_TO_NEXT_PAINT_MS?.percentile ?? null,
-    fcp: crunx.FIRST_CONTENTFUL_PAINT_MS?.percentile ?? null,
-    ttfb: lighthouse.audits['server-response-time']?.numericValue ?? null,
-    lcpRating: crunx.LARGEST_CONTENTFUL_PAINT_MS
-      ? categoryToRating(crunx.LARGEST_CONTENTFUL_PAINT_MS.category)
-      : null,
-    clsRating: crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE
-      ? categoryToRating(crunx.CUMULATIVE_LAYOUT_SHIFT_SCORE.category)
-      : null,
-    inpRating: crunx.INTERACTION_TO_NEXT_PAINT_MS
-      ? categoryToRating(crunx.INTERACTION_TO_NEXT_PAINT_MS.category)
-      : null,
-    fcpRating: crunx.FIRST_CONTENTFUL_PAINT_MS
-      ? categoryToRating(crunx.FIRST_CONTENTFUL_PAINT_MS.category)
-      : null,
-    ttfbRating: null, // TTFB doesn't have CrUX category
-    lighthouseJson: JSON.stringify(data),
-  };
-}
